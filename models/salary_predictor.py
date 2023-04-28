@@ -15,7 +15,7 @@ class SalaryPredictor:
         cat_embeds = []
         for i, column_name in enumerate(X_categorical.columns):
             cat_input = Input(shape=(1,), name=f'cat_input_{i}')
-            cat_embed = Embedding(X_categorical[column_name].nunique(), 15,
+            cat_embed = Embedding(X_categorical[column_name].nunique(), 3,
                                   name=f'cat_embedding_{i}')(cat_input)
             cat_embed = Flatten()(cat_embed)
             cat_inputs.append(cat_input)
