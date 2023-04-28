@@ -82,6 +82,7 @@ if __name__ == '__main__':
         X_continuous = pickle.load(f)
     with open(f'train_data/y.pkl', 'rb') as f:
         y = pickle.load(f)
+
     model.build(X_categorical, X_continuous)
     print(model.model.summary())
     model.train(X_categorical, X_continuous, y)

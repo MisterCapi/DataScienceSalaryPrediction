@@ -14,9 +14,6 @@ continuous_columns = ['work_year', 'remote_ratio', 'salary_in_usd']
 def prepare_dataframe_to_train(train_df_path: str):
     df = pd.read_csv(train_df_path)
 
-    # drop the 'salary' column
-    df.drop(columns=['salary'], inplace=True)
-
     # Convert some categories to one-hots
     for categorical_feature in categorical_to_onehot:
         df = pd.concat([df, pd.get_dummies(df[categorical_feature], prefix=categorical_feature)], axis=1)
@@ -46,6 +43,7 @@ def prepare_dataframe_to_train(train_df_path: str):
 
     X_continuous = df[continuous_columns[:-1] + [f'{categorical_feature}_{cat}' for categorical_feature
                                                  in categorical_to_onehot for cat in df[categorical_feature].unique()]]
+    X_continuous = X_continuous.astype(float)
 
     return X_categorical, X_continuous, y
 
@@ -53,8 +51,9 @@ def prepare_dataframe_to_train(train_df_path: str):
 def prepare_dataframe_to_test(train_df_path: str):
     df = pd.read_csv(train_df_path)
 
-    # drop the 'salary' column
-    df.drop(columns=['salary'], inplace=True)
+    # Convert some categories to one-hots
+    for categorical_feature in categorical_to_onehot:
+        df = pd.concat([df, pd.get_dummies(df[categorical_feature], prefix=categorical_feature)], axis=1)
 
     # Get all categorical features
     for categorical_feature in categorical_columns:
@@ -74,7 +73,9 @@ def prepare_dataframe_to_test(train_df_path: str):
     # separate the target variable 'salary_in_usd'
     y = df.pop('salary_in_usd')
 
-    X_continuous = df[continuous_columns[:-1]]
+    X_continuous = df[continuous_columns[:-1] + [f'{categorical_feature}_{cat}' for categorical_feature
+                                                 in categorical_to_onehot for cat in df[categorical_feature].unique()]]
+    X_continuous = X_continuous.astype(float)
 
     return X_categorical, X_continuous, y
 
@@ -89,11 +90,11 @@ if __name__ == '__main__':
     with open(f'train_data/y.pkl', 'wb') as f:
         pickle.dump(y, f)
 
-    # X_categorical, X_continuous, y = prepare_dataframe_to_test("test.csv")
-    # os.makedirs('test_data', exist_ok=True)
-    # with open(f'test_data/X_categorical.pkl', 'wb') as f:
-    #     pickle.dump(X_categorical, f)
-    # with open(f'test_data/X_continuous.pkl', 'wb') as f:
-    #     pickle.dump(X_continuous, f)
-    # with open(f'test_data/y.pkl', 'wb') as f:
-    #     pickle.dump(y, f)
+    X_categorical, X_continuous, y = prepare_dataframe_to_test("test.csv")
+    os.makedirs('test_data', exist_ok=True)
+    with open(f'test_data/X_categorical.pkl', 'wb') as f:
+        pickle.dump(X_categorical, f)
+    with open(f'test_data/X_continuous.pkl', 'wb') as f:
+        pickle.dump(X_continuous, f)
+    with open(f'test_data/y.pkl', 'wb') as f:
+        pickle.dump(y, f)
