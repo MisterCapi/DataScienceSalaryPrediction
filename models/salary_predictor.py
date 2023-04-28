@@ -14,9 +14,9 @@ class SalaryPredictor:
         cat_inputs = []
         cat_embeds = []
         for i, column_name in enumerate(X_categorical.columns):
-            cat_input = Input(shape=(1,), name=f'cat_input_{i}')
+            cat_input = Input(shape=(1,), name=f'cat_input_{column_name}')
             cat_embed = Embedding(X_categorical[column_name].nunique(), 3,
-                                  name=f'cat_embedding_{i}')(cat_input)
+                                  name=f'cat_embedding_{column_name}')(cat_input)
             cat_embed = Flatten()(cat_embed)
             cat_inputs.append(cat_input)
             cat_embeds.append(cat_embed)
@@ -85,6 +85,23 @@ if __name__ == '__main__':
 
     model.build(X_categorical, X_continuous)
     print(model.model.summary())
+
+    # Show model
+    tf.keras.utils.plot_model(
+        model.model,
+        to_file="model.png",
+        show_shapes=True,
+        show_dtype=True,
+        show_layer_names=True,
+        rankdir="TB",
+        expand_nested=False,
+        dpi=96,
+        layer_range=None,
+        show_layer_activations=False,
+        show_trainable=False,
+    )
+
+    # Train model
     model.train(X_categorical, X_continuous, y)
 
     with open(f'test_data/X_categorical.pkl', 'rb') as f:
