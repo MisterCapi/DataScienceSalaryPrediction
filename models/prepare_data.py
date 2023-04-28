@@ -4,8 +4,9 @@ import pickle
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
-categorical_columns = ['experience_level', 'employment_type', 'job_title', 'salary_currency', 'employee_residence',
-                       'company_location', 'company_size']
+categorical_columns = ['job_title', 'salary_currency', 'employee_residence', 'company_location']
+
+categorical_to_onehot = ['experience_level', 'employment_type', 'company_size']
 
 continuous_columns = ['work_year', 'remote_ratio', 'salary_in_usd']
 
@@ -15,6 +16,10 @@ def prepare_dataframe_to_train(train_df_path: str):
 
     # drop the 'salary' column
     df.drop(columns=['salary'], inplace=True)
+
+    # Convert some categories to one-hots
+    for categorical_feature in categorical_to_onehot:
+        df = pd.concat([df, pd.get_dummies(df[categorical_feature], prefix=categorical_feature)], axis=1)
 
     # Get all categorical features
     os.makedirs('encoders', exist_ok=True)
@@ -39,7 +44,8 @@ def prepare_dataframe_to_train(train_df_path: str):
     # separate the target variable 'salary_in_usd'
     y = df.pop('salary_in_usd')
 
-    X_continuous = df[continuous_columns[:-1]]
+    X_continuous = df[continuous_columns[:-1] + [f'{categorical_feature}_{cat}' for categorical_feature
+                                                 in categorical_to_onehot for cat in df[categorical_feature].unique()]]
 
     return X_categorical, X_continuous, y
 
@@ -83,11 +89,11 @@ if __name__ == '__main__':
     with open(f'train_data/y.pkl', 'wb') as f:
         pickle.dump(y, f)
 
-    X_categorical, X_continuous, y = prepare_dataframe_to_test("test.csv")
-    os.makedirs('test_data', exist_ok=True)
-    with open(f'test_data/X_categorical.pkl', 'wb') as f:
-        pickle.dump(X_categorical, f)
-    with open(f'test_data/X_continuous.pkl', 'wb') as f:
-        pickle.dump(X_continuous, f)
-    with open(f'test_data/y.pkl', 'wb') as f:
-        pickle.dump(y, f)
+    # X_categorical, X_continuous, y = prepare_dataframe_to_test("test.csv")
+    # os.makedirs('test_data', exist_ok=True)
+    # with open(f'test_data/X_categorical.pkl', 'wb') as f:
+    #     pickle.dump(X_categorical, f)
+    # with open(f'test_data/X_continuous.pkl', 'wb') as f:
+    #     pickle.dump(X_continuous, f)
+    # with open(f'test_data/y.pkl', 'wb') as f:
+    #     pickle.dump(y, f)
