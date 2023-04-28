@@ -1,9 +1,9 @@
 import pickle
 
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Embedding, Dense, Concatenate, Flatten
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.metrics import mean_absolute_error
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.layers import Input, Embedding, Dense, Concatenate, Flatten
 
 
 class SalaryPredictor:

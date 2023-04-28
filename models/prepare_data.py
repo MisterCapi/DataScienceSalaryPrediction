@@ -1,8 +1,8 @@
 import os
+import pickle
 
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler, StandardScaler
-import pickle
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 categorical_columns = ['experience_level', 'employment_type', 'job_title', 'salary_currency', 'employee_residence',
                        'company_location', 'company_size']
